@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	{% if title %}<title>{{ title }}</title>{% endif %}
+        <style>
+                #u_p_form button{
+                        text-align:left;
+                        padding-left:17PX;
+                        border-color:#e9e9e9;
+                        background-color: transparent;
+                        width:170px;
+                        height:30px;
+                }
+                #select_version{
+                        border-bottom:2px solid #007FFF;
+                        border-left-color: transparent;
+                        border-right-color: transparent;
+                        border-top-color: transparent;
+                }
+
+				#products{
+						width: 100%;
+						height: 90%;
+						position:fixed;
+						top:0;
+						left:0;
+						z-index: 1;
+						padding: 20px;
+						overflow:auto;
+				}
+				.under_line{
+                        color: #007FFF;
+						font-weight: bold;
+				}
+				.pointer{
+						cursor: pointer;
+				}
+				.hover-blue:hover {
+						color: #007FFF;
+				}
+				option:hover {
+						cursor: pointer;
+						color: #007FFF;
+				}
+				
+        </style>
+
+    {% endblock head %}
+	
+		<script>
+	        function select_onchange()
+			{
+					let select = document.getElementById('select_version')
+					let value = select.options[select.selectedIndex].value;
+					
+					if (value != 'new_ver')
+						document.getElementById('old_version').submit();
+					else
+						document.getElementById('new_version').submit();
+			}
+		</script>
+</head>
+<body>
+        {% block content %}
+
+        <div id="products">
+                <table>
+                        <tr>
+                                <td>
+                                </td>
+
+                                <td rowspan="2" valign="top" style="padding-left: 30px;">
+                                        {% if product %}
+                                                <table>
+                                                        <tr>
+                                                                <td>選擇版本 :</td>
+                                                                <td>
+                                                                        <form method="POST" action="{{ url_for('get_version') }}" id="old_version">
+                                                                               <select class="pointer" name="version" id="select_version" onchange="select_onchange();">
+                                                                               {% if version %}
+                                                                               <option class="under_line" disabled="disabled" selected="selected">{{ version }}</option>
+                                                                               {% else %}
+                                                                               <option class="under_line" disabled="disabled" selected="selected">version</option>
+                                                                               {% endif %}
+                                                                               {% for ver in unique_version_list %}
+                                                                               <option value='{{ ver }}'>{{ ver }}</option>
+                                                                               <br>
+                                                                               {% endfor %}
+																			   
+                                                                               <option value='new_ver'>+ 新增版本</option>
+                                                                               </select>
+                                                                               <input type="text" name="product" value="{{ product }}" style="display:none;">
+                                                                        </form>
+																		
+																		<form method="POST" action="{{ url_for('new_version') }}" id="new_version">
+                                                                               <input type="text" name="product" value="{{ product }}" style="display:none;">
+																		</form>
+																</td>
+                                                        </tr>
+                                                </table>
+                                        {% endif %}
+
+                                        {% endblock content %}
+
+                                </td>
+                        </tr>
+                        <tr>
+                                <td>
+                                        <br><br><br><br><br><br>
+                                        <form method="POST" action="{{ url_for('get_product') }}"  id="u_p_form">
+                                                {% for product in unique_product_list%}
+                                                        <button class="pointer hover-blue" type="submit" name="product" value="{{ product }}"> {{ product }}</button>
+                                                        <br>
+                                                {% endfor %}
+                                        </form>
+                                </td>
+                        </tr>
+                </table>
+        </div>
+        {% block form %}
+        {% endblock form %}
+</body>
+</html>

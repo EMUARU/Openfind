@@ -1,0 +1,242 @@
+{% extends "home.html" %}
+
+{% block head %}
+    {{ super() }}
+        <style>
+		{% block style %}
+				.line td, th{
+						border-right: 1.5px solid #d9d9d9;
+						width:100px;
+				}
+				.line .no_border {
+						border-right: 0px solid #d9d9d9;
+				}
+				.line .product_link {
+						border-right: 0px solid #d9d9d9;
+				}
+				.line .product_link:hover {
+						color: #007FFF;
+						cursor: pointer;
+				}
+				
+				#append{
+						border-radius: 12px;
+						border-color: transparent ;
+						background-color: #007FFF ;
+						color:white;
+				}
+				#awake{
+						display: block;
+						color: red;
+						padding-left: 50px;
+				}
+				#products_table td button{
+						background-color: transparent;
+						border-color: transparent;
+						color: #007FFF;
+				}
+				#apply, #cancel{
+						background-color: transparent;
+						color: #007FFF;
+						border-color: #007FFF;
+						border-radius: 12px;
+						display: block;
+				}
+		{% endblock style %}
+        </style>
+        {% block script %}
+                <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+                <script>
+                        window.onload=function(){
+                                (function() {
+                                        let gray_item = document.getElementsByTagName("td");
+
+                                        for(let i = 0; i < gray_item.length; i++)
+                                        {
+                                                if(gray_item[i].innerHTML == "--")
+														gray_item[i].style.color = "gray";
+                                        }
+										
+										
+										let products_id = document.getElementsByName("product_id");
+										let _products = document.getElementsByName("_product");
+										{% if new_products %}
+										let _new_products = {{ new_products }};
+										{% else %}
+										let _new_products = [];
+										{% endif %}
+										
+										for(let i = 0; i < products_id.length; i++)
+										{
+												let td = _products[i].getElementsByTagName("td");
+												for(let k = 0; k < td.length; k++)
+												{
+													td[k].style.borderTop = "2px solid transparent";
+													td[k].style.borderBottom = "2px solid transparent";
+												}
+										
+														
+												for(let j = 0; j < {{ new_products|length }}; j++)
+												{
+														if( products_id[i].innerHTML == _new_products[j] )
+														{
+															let td = _products[i].getElementsByTagName("td");
+															for(let k = 0; k < td.length; k++)
+															{
+																td[k].style.borderTop = "2px solid #007FFF";
+																td[k].style.borderBottom = "2px solid #007FFF";
+															}
+														
+															_products[i].getElementsByClassName("p_left")[0].style.borderLeft = "2px solid #007FFF";
+															_products[i].getElementsByClassName("p_right")[0].style.borderRight = "2px solid #007FFF";
+														
+														}
+												}
+										}
+								
+								
+                                })();
+                        }
+
+                        function checkDelete()
+                        {
+                                let check = confirm('您確定要刪除這筆資料嗎?');
+
+                                if(check)
+                                {
+                                        alert('資料已刪除')
+                                        return true;
+                                }
+                                else
+                                {
+                                        alert('取消刪除')
+                                        return false;
+                                }
+                        }
+
+                        function cancelUpdFile()
+                        {
+                                document.getElementById("apply").style.display = "none";
+                                document.getElementById("cancel").style.display = "none";
+                                document.getElementById("awake").innerHTML = '<br>';
+								
+								
+								let _products = document.getElementsByName("_product");
+								
+								for(let i = 0; i < _products.length; i++)
+								{
+									let td = _products[i].getElementsByTagName("td")
+									for(let k = 0; k < td.length; k++)
+									{
+										if(td[k].style.borderTop == "2px solid rgb(0, 127, 255)")
+											td[k].style.borderTop = "2px solid transparent";
+										if(td[k].style.borderBottom == "2px solid rgb(0, 127, 255)")
+											td[k].style.borderBottom = "2px solid transparent";
+										if(td[k].style.borderLeft == "2px solid rgb(0, 127, 255)")
+											td[k].style.borderLeft = "2px solid transparent";
+										if(td[k].style.borderRight == "2px solid rgb(0, 127, 255)")
+											td[k].style.borderRight = "2px solid transparent";
+									}
+								}
+                                return false;
+                        }
+
+                        function download(obj)
+                        {
+                                document.getElementById('download_file_path').value = obj.innerHTML;
+                                document.getElementById('download_file').submit();
+                        }
+                </script>
+        {% endblock script %}
+
+{% endblock head %}
+{% block content%}
+                {{ super() }}
+                {% block list %}
+                        <br>
+                        <table>
+                                <tr>
+                                        <td>
+                                                <form method="POST" action="{{ url_for('insert_form') }}" name="append">
+                                                        <input type="submit" class="pointer" value="新增欄位" id="append">
+                                                        <input type="text" name="product" value="{{ product }}" style="display:none;">
+                                                        <input type="text" name="version" value="{{ version }}" style="display:none;">
+                                                </form>
+                                        </td>
+                                        <td>
+                                                {% if check_update_file %}
+                                                        <p id="awake">提醒：更新完畢後必須點擊套用才會更新至 Files.txt 喔！表格中標示藍色的欄位為尚未同步至 txt 檔的資料。</p>
+                                                {% else %}
+                                                        <p>&ensp;</p>
+                                                {% endif %}
+                                        </td>
+                                </tr>
+                        </table>
+
+						<form method="POST" action="{{ url_for('download_file') }}" id="download_file" name="download_file">
+								<input type="text" name="download_file_path" id='download_file_path' style="display:none;">
+								<input type="text" name="product" value="{{ product }}" style="display:none;">
+								<input type="text" name="version" value="{{ version }}" style="display:none;">
+						</form>
+
+                        <form method="POST" action="{{ url_for('delete_or_update') }}" id="dlist" name="dlist">
+                                <table id="products_table" style="width:90%">
+                                        <tr class="line" bgcolor=#e9e9e9>
+                                                <th></th>
+                                                <th></th>
+                                                <th>Product</th>
+                                                <th>Version</th>
+                                                <th>System Type</th>
+                                                <th>Type</th>
+                                                <th>Name</th>
+                                                <th>OS</th>
+                                                <th>Link</th>
+                                        </tr>
+                                        {% for product in product_list %}
+                                                <tr class="line" name="_product">
+                                                        <td class="no_border p_left">
+                                                                <button class="pointer" type="submit" name="update" value='{{ product["id"] }}'>編輯</button>
+                                                        </td>
+                                                        <td class="no_border">
+                                                                <button class="pointer" type="submit" name="delete" value='{{ product["id"] }}' onclick="return checkDelete()"><span style='color: red;'>刪除</span></button>
+                                                        </td>
+                                                        <td name="product_id" style="display:none;">{{ product['id'] }}</td>
+                                                        <td>{{ product['product'] }}</td>
+                                                        <td>{{ product['version'] }}</td>
+                                                        <td>{{ product['systemtype'] }}</td>
+                                                        <td>{{ product['servertype'] }}</td>
+                                                        <td>{{ product['name'] }}</td>
+                                                        <td>{{ product['os'] }}</td>
+                                                        <td class="product_link p_right" onclick="download(this)">{{ product['link'] }}</td>
+                                                </tr>
+                                        {% endfor %}
+                                </table>
+                                <input type="text" name="product" value="{{ product }}" style="display:none;">
+                                <input type="text" name="version" value="{{ version }}" style="display:none;">
+
+                        </form>
+                {% endblock list %}
+
+                {% if check_update_file %}
+                        <br>
+                        <form method="POST" action="/update_file" name="update" style="padding-left: 40%;">
+                                <table>
+                                        <tr>
+                                                <td>
+                                                        <input class="pointer" type="submit" value="套用" id="apply"><div style="width: 70px;"></div>
+                                                </td>
+                                                <td>
+                                                        <input class="pointer" type="submit" value="取消" id="cancel" onclick="return cancelUpdFile()">
+                                                </td>
+                                        </tr>
+                                </table>
+                                <input type="text" name="product" value="{{ product }}" style="display:none;">
+                                <input type="text" name="version" value="{{ version }}" style="display:none;">
+                        </form>
+						
+                {% endif %}
+
+{% endblock content %}
+
+{% block form %}
+{% endblock form %}

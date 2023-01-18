@@ -1,0 +1,492 @@
+{% extends "product.html" %}
+
+{% block style %}
+        {{ super() }}
+		#gray {
+                background: rgba(104, 104, 104, 0.5);
+                width: 100%;
+                height: 100%;
+                position:fixed;
+                top:0;
+                left:0;
+                z-index: 2;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow:auto;
+        }
+        #append_form {
+                background: rgba(255, 255, 255, 1);
+                width: 80%;
+                left: 10%;
+                z-index: 3;
+                align-items: center;
+                justify-content: center;
+        }
+		#upload_animetion{
+                background: rgba(255, 255, 255, 0);
+                z-index: 4;
+				position: absolute;
+				top:  50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+        }
+
+{% block form_style %}
+        #input_table{
+                width: 110%;
+                table-layout: fixed;
+                margin-bottom: 5px;
+                border-collapse: collapse;
+		}
+		#input_table th, #input_table td{
+                width: 70%;
+				border: 1px solid #cdcdcd;
+				padding: 5px;
+				text-align: left;
+                border-color:transparent;
+        }
+        #input_table td input{
+                width: 100%;
+        }
+        #input_table .links, #input_table .links{
+                width: 300%;
+        }
+        #input_table .files, #input_table .files{
+        width:300%;
+                opacity:10;
+        }
+        #input_table .state, #input_table .state{
+                width: 300%;
+        }
+        .new_insert input{
+                border-left-color:transparent;
+                border-right-color:transparent;
+                border-top-color:transparent;
+                border-bottom-color:#1E90FF;
+        }
+        .new_insert .remove_row{
+                border-left-color:transparent;
+                border-right-color:transparent;
+                border-top-color:transparent;
+                border-bottom-color:transparent;
+                background-color: transparent;
+				color: blue;
+				font-weight: bold;
+        }
+		
+        .new_insert .remove_row:hover{
+				cursor: pointer;
+        }
+        #make_sure button{
+                border-radius: 12px;
+                color:#1E90FF;
+                border-color:#1E90FF;
+                background-color:transparent;
+        }
+        .add_row{
+                border-color: transparent;
+                color: blue;
+                background-color: transparent;
+        }
+        .blue{
+                color: blue;
+        }
+        .upload_file_button{
+                display: block;
+                background-color: #1E90FF;
+                color: white;
+                width: 80px;
+                text-align: center;
+                border: 2px solid #1E90FF;
+                padding: 3px;
+                border-radius: 45px;
+        }
+{% endblock form_style %}
+{% endblock style %}
+
+
+{% block script %}
+        {{ super() }}
+
+        {% block form_script %}
+        <script>
+                var index = 0;
+                var count = 0;
+
+                window.onload=function(){
+                        (function() {
+                                {% block inputs%}
+                                const names = ['v', 'st', 't', 'n', 'o', 'fc', 'l', 'fi', 'upload_file', 'empty'];
+                                {% endblock inputs%}
+                                for(let i = 0; i < names.length; i++)
+                                {
+                                        document.getElementById(names[i]).setAttribute('id', names[i]+'('+count.toString()+')');
+                                        document.getElementsByName(names[i])[0].setAttribute('name', names[i]+'('+count.toString()+')');
+                                }
+                                index++;
+								count++;
+                                document.getElementsByName('number_of_new_item')[0].setAttribute('value', count.toString());
+                        })();
+                }
+
+                $(document).ready(function(){
+                        $(".add_row").click(function(){
+                                var markup = "\
+                                <tr class='blue'>\
+                                        <th></th>\
+                                        <th>Product</th>\
+                                        <th>Version</th>\
+                                        <th>System Type</th>\
+                                        <th>Type</th>\
+                                        <th>Name</th>\
+                                        <th>OS</th>\
+                                        <th style='width:100px;'>File Classification</th>\
+                                        <th class='links'>Link</th>\
+                                        <th class='files'></th>\
+								</tr>\
+                                <tr class='new_insert'>\
+										<td>\
+											<input type='button' class='remove_row pointer' value='X' style='display:block;' >\
+										</td>\
+                                        <td><input type='text' value='{{ product }}' readonly='readonly'  style='width:80%'></td>\
+										{% if new_version_mode %}\
+                                        <td><input class='v' list='versions' placeholder='空白' name='v("+count.toString()+")' onchange='change_link(this)' id='v("+count.toString()+")' style='width:80%'></td>\
+										{% else %}\
+										<td><input class='v' type='text' placeholder='空白' name='v("+count.toString()+")' value='{{ version }}' readonly='readonly' id='v("+count.toString()+")' style='width:80%'></td>\
+										{% endif %}\
+										<td><input list='system_types' placeholder='空白' name='st("+count.toString()+")' style='width:80%'></td>\
+                                        <td><input list='types' placeholder='空白' name='t("+count.toString()+")'style='width:80%'></td>\
+                                        <td><input list='names' placeholder='空白' name='n("+count.toString()+")'style='width:80%'></td>\
+                                        <td><input list='oss' placeholder='空白' name='o("+count.toString()+")' style='width:80%'></td>\
+                                        <td><input list='file_classifications' placeholder='空白' name='fc("+count.toString()+")' onchange='change_link(this)' id='fc("+count.toString()+")' style='width:80%'></td>\
+                                        <td class='links'><input type='text' name='l("+count.toString()+")' value='' id='l("+count.toString()+")' style='display:none;width:90%'>\
+                                                <input type='text' name='empty("+count.toString()+")' value='上傳檔案後會顯示預設上傳位置' id='empty("+count.toString()+")' readonly='readonly' style='display:block; width:60%; color: gray;'></td>\
+                                        <td class='files'>\
+                                                <input type='file' name='fi("+count.toString()+")' onchange='change_link(this)' id='fi("+count.toString()+")' style='display:none'>\
+                                                <label for='fi("+count.toString()+")' class='upload_file_button pointer'>\
+                                                        選擇檔案\
+                                                </label>\
+                                                <input type='text' name='upload_file("+count.toString()+")' value='no' id='upload_file("+count.toString()+")' style='display:none;'></td>\
+                                </tr>";
+
+                                $("#input_table tbody").append(markup);
+                                index++;
+								count++;
+                                document.getElementsByName('number_of_new_item')[0].setAttribute('value', index.toString());
+                                document.getElementsByClassName('remove_row')[0].style.display = "block";
+						});
+						
+						$("#input_table").on('click', '.remove_row', function () {
+							$(this).closest('tr').prev('tr').remove();
+							$(this).closest('tr').remove();
+							
+							if(index > 1)
+							{
+								index--;
+								document.getElementsByName('number_of_new_item')[0].setAttribute('value', index.toString());
+							}
+							if(index == 1)
+								document.getElementsByClassName('remove_row')[0].style.display = "none";
+						});
+						
+                });
+
+                function change_link(obj)
+                {
+                        let number = obj.id.replace(/[^0-9]/ig, "");
+                        let versionID = 'v('+ number +')';
+                        let fileClassificationsID = 'fc('+ number +')';
+                        let linkID = 'l('+ number +')';
+                        let fileID = 'fi('+ number +')';
+                        let uploadID = 'upload_file('+ number +')';
+                        let emptyID = 'empty('+ number +')';
+
+                        if(obj.id[0] == 'f' && obj.id[1] == 'i')
+                        {
+                                document.getElementById(linkID).style.display = "block";
+                                document.getElementById(emptyID).style.display = "none";
+                                document.getElementById(uploadID).value = 'yes';
+                        }
+
+                        document.getElementById(linkID).value = '/Product/' + '{{ product }}';
+
+                        let version = "";
+                        if(document.getElementById(versionID).value != "")
+                                version = convert_to_real_version(document.getElementById(versionID).value);
+                        document.getElementById(linkID).value += ('/' + version);
+
+                        {% block add_file_classificationsID_to_link %}
+                        if(document.getElementById(fileClassificationsID).value != "")
+                                document.getElementById(linkID).value += ('/' + document.getElementById(fileClassificationsID).value);
+                        {% endblock add_file_classificationsID_to_link %}
+
+                        let fullFileName = document.getElementById(fileID).value;
+                        let fileName = getFileName(fullFileName);
+                        document.getElementById(linkID).value += ('/' + fileName);
+
+                        if(fileName == "")
+                        {
+                                document.getElementById(linkID).value = "";
+                                document.getElementById(linkID).style.display = "none";
+                                document.getElementById(emptyID).style.display = "block";
+                                document.getElementById(uploadID).value = 'no';
+                        }
+                }
+
+                function convert_to_real_version(version)
+                {
+                        let realVersion = 'v' + version.replace(".", "");
+                        realVersion = realVersion.toLowerCase();
+                        return realVersion;
+                }
+
+                function getFileName(o)
+                {
+                        var pos=o.lastIndexOf("\\");
+                        return o.substring(pos+1);
+                }
+
+                function checkVersionFilled()
+                {
+						let allowed_extension = ['tgz', 'zip', 'pdf', 'gz'];
+						
+						let first_in = true;
+						let last_ver = "";
+				
+                        for(let i = 0; i < count; i++)
+                        {
+                                let versionID = 'v('+ i +')';
+								
+								if(!!document.getElementById(versionID))
+								{
+									let linkID = 'l('+ i +')';
+									let fileID = 'fi('+ i +')';
+									let uploadID = 'upload_file('+ i +')';
+									if(document.getElementById(versionID).value == "")
+									{
+											alert("請確認所有新增資料都已填寫版本資訊");
+											return false;
+									}
+									
+									{% if insert_mode %}
+									if(document.getElementById(linkID).value == "")
+									{
+											alert("請確認所有新增資料都已填寫檔案欄位");
+											return false;
+									}
+									
+									
+									if(first_in)
+									{
+										first_in = false;
+										last_ver = document.getElementById(versionID).value;
+									}
+									else
+									{
+										if(document.getElementById(versionID).value != last_ver)
+										{
+											alert("請確認所有新增檔案之版本皆相同");
+											return false;
+										}
+									}
+									{% endif %}
+									
+									if(document.getElementById(uploadID).value == "yes")
+									{
+										let fullFileName = document.getElementById(fileID).value;
+										let fileName = getFileName(fullFileName);
+										let extension = fileName.split('.').pop();
+										
+										if(!allowed_extension.includes(extension))
+										{
+												alert("請確認所有新增檔案之副檔名皆包含於('tgz', 'zip', 'pdf', 'gz')");
+												return false;
+										}
+									}
+								}
+                        }
+						
+						document.getElementById('upload_gif').style.display = "block";
+						document.getElementById('insert_version').value = document.getElementsByClassName('v')[0].value;
+                        return true;
+                }
+        </script>
+        {% endblock form_script %}
+
+{% endblock script%}
+
+
+
+{% if new_version_mode %}
+	{% block list %}
+	{% endblock list %}
+{% endif %}
+
+
+
+
+{% block form %}
+        <div id="gray">
+                <div id="append_form">
+                        <p align="center"><b>
+                                {% if insert_mode %}
+                                        新增資料
+                                {% elif update_mode %}
+                                        編輯資料
+                                {% endif %}
+                        </p>
+                        <hr>
+                        {% block url %}
+                        <form method="POST" action="/add_item" id="alist" name="alist" enctype="multipart/form-data">
+                        {% endblock url %}
+                                <table id="input_table">
+									<thead>
+                                        <tr class="blue">
+                                                <th></th>
+                                                <th>Product</th>
+                                                <th>Version</th>
+                                                <th>System Type</th>
+                                                <th>Type</th>
+                                                <th>Name</th>
+                                                <th>OS</th>
+                                                {% block file_classification%}
+                                                <th style="width:100px;">File Classification</th>
+                                                {% endblock file_classification%}
+                                                <th class="links">Link</th>
+                                                <th class="files"></th>
+                                        </tr>
+                                        <tr class="new_insert">
+                                                <td>
+													<input type="button" class="remove_row pointer" value="X" style="display:none;" >
+												</td>
+                                                <td><input type='text' value="{{ product }}" readonly='readonly'  style='width:80%'></td>
+                                                {% block first_data %}
+												
+												{% if new_version_mode %}
+                                                <td><input class="v" list="versions" placeholder="空白" name="v" onchange="change_link(this)" id='v' style="width: 80%;"></td>
+                                                {% else %}
+												<td><input class="v" type="text" placeholder="空白" name="v" value="{{ version }}" readonly='readonly' id='v' style="width: 80%;"></td>
+                                                {% endif %}
+
+												<td><input list="system_types" placeholder="空白" name="st" id='st' style="width: 80%"></td>
+                                                <td><input list="types" placeholder="空白" name="t" id='t' style="width: 80%"></td>
+                                                <td><input list="names" placeholder="空白" name="n" id='n' style="width: 80%"></td>
+                                                <td><input list="oss" placeholder="空白" name="o" id='o' style="width: 80%"></td>
+                                                <td><input list="file_classifications" placeholder="空白" name="fc" onchange="change_link(this)" id='fc' style="width: 80%"></td>
+                                                <td class="links"><input type="text" name="l" value="" id='l' style="width:90%;display:none">
+                                                <input type="text" name="empty" value="上傳檔案後會顯示預設上傳位置" id='empty' readonly='readonly' style="display:block;width: 60%; color: gray;"></td>
+                                                {% endblock first_data %}
+                                                        <td class="files">
+                                                                <input type="file" name="fi" onchange="change_link(this)" id='fi' style="display:none">
+                                                                <label for="fi(0)" class="upload_file_button pointer">
+                                                                        選擇檔案
+                                                                </label>
+                                                <input type="text" name="upload_file" value="no" id='upload_file' style="display:none;">
+                                                {% block update_id %}{% endblock update_id %}</td>
+
+                                        </tr>
+									</thead>
+									<tbody>
+									</tbody>
+                                </table>
+
+
+                                <input type="text" name="number_of_new_item" value="1" style="display:none;">
+
+                                {% block append_data %}
+								<table>
+									<tr>
+										<td>
+											<input type="button" class="add_row pointer" value="+新增一筆資料" >
+										</td>
+									</tr>
+								</table>
+                                {% endblock append_data %}
+
+                                <input type="text" name="product" value="{{ product }}" style="display:none;">
+                                <input type="text" id="insert_version" name="version" value="{{ version }}" style="display:none;">
+                        </form>
+
+                        <table style="float:right;" id="make_sure">
+                                <tr>
+                                        <td style="border-color:transparent;" >
+                                                <button class="pointer" type="submit" onclick="return checkVersionFilled()" form="alist">確定</button>
+                                        </td>
+                                        <td style="border-color:transparent;">
+                                                <form method="POST" action="{{ url_for('add_item_cancel') }}">
+                                                        <button class="pointer" type="submit">取消</button>
+                                                        <input type="text" name="product" value="{{ product }}" style="display:none;">
+                                                        <input type="text" name="version" value="{{ version }}" style="display:none;">
+                                                </form>
+                                        </td>
+                                </tr>
+                        </table>
+
+                        <datalist id="versions">
+                                {% for new_ver in unique_version_list %}
+                                        <option value="{{ new_ver }}"></option>
+                                {% endfor %}
+                        </datalist>
+
+                        <datalist id="system_types">
+                                <option value="64"></option>
+                                <option value="32"></option>
+                        </datalist>
+
+                        <datalist id="types">
+                                <option value="ms"></option>
+                                <option value="ss"></option>
+                                <option value="clg"></option>
+                                <option value="DB"></option>
+                        </datalist>
+
+                        <datalist id="names">
+                                <option value="Group (群組)"></option>
+                                <option value="Calendar(行事曆模組)"></option>
+                                <option value="Group_Cal(群組加行事曆)"></option>
+                                <option value="Language-chs(多國語言模組-簡體中文)"></option>
+                                <option value="Language-en(多國語言模組-英文)"></option>
+                                <option value="Mobile(行動模組)"></option>
+                                <option value="Preview(預覽模組)"></option>
+                                <option value="SMS(簡訊模組)"></option>
+                                <option value="LDAP (認證模組)"></option>
+                                <option value="SSO (Single Sign On)"></option>
+                                <option value="Search(搜尋模組)"></option>
+                                <option value="Signature(公用簽名檔模組)"></option>
+                                <option value="Sophos"></option>
+                                <option value="ClamAV"></option>
+                                <option value="Funambol"></option>
+                                <option value="M2KCE"></option>
+                                <option value="Prizm(附檔圖文預覽模組)"></option>
+                                <option value="ActiveSync(同步模組)"></option>
+                                <option value="MGLite"></option>
+                                <option value="iPhone"></option>
+                                <option value="MLP"></option>
+                                <option value="PKI"></option>
+                                <option value="Patch"></option>
+                                <option value="MailGates"></option>
+                                <option value="Sophos"></option>
+                                <option value="PAINLESS"></option>
+                        </datalist>
+
+                        <datalist id="oss">
+                                <option value="FreeBSD"></option>
+                                <option value="Linux"></option>
+                                <option value="Solaris"></option>
+                                <option value="None(沒有區分)"></option>
+                        </datalist>
+
+                        <datalist id="file_classifications">
+                                <option value="Package"></option>
+                                <option value="Manual"></option>
+                                <option value="CommonModules"></option>
+                        </datalist>
+						
+						<div id="upload_animetion">
+							<img src="http://172.16.222.31/Product/upload.gif" id="upload_gif" alt="檔案上傳中" style="display:none;"/>
+						</div>
+
+                </div>
+        </div>
+{% endblock form %}

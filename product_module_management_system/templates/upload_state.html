@@ -1,0 +1,142 @@
+{% extends "form.html" %}
+
+{% block form_style %}
+        #input_table{
+                width: 100%;
+                table-layout: fixed;
+                margin-bottom: 5px;
+                border-collapse: collapse;
+    }
+    #input_table th, #input_table td{
+                width: 30%;
+        border: 1px solid #cdcdcd;
+        padding: 5px;
+        text-align: left;
+                border-color:transparent;
+        }
+        #input_table td input{
+                width: 60%;
+        }
+        #input_table .links, #input_table .links{
+                width: 100%;
+        }
+        #input_table .state, #input_table .state{
+                width: 100%;
+        }
+        .blue{
+                color:blue;
+        }
+        .insert_sucess input{
+                border-color:transparent;
+        }
+        #make_sure{
+                float:right;
+                margin-right:50px;
+                margin-bottom:20px;
+                border-radius: 12px;
+                color:#1E90FF;
+                border-color:#1E90FF;
+                background-color:transparent;
+        }
+{% endblock form_style %}
+
+{% block form_script %}
+<script>
+        window.onload=function(){
+                        (function() {
+                                var names = ['v', 'st', 't', 'n', 'o', 'l'];
+
+                                {% if insert_mode %}
+                                        names = ['v', 'st', 't', 'n', 'o', 'fc', 'l'];
+                                {% endif %}
+
+                                let insert_data = {{ insert_data | tojson }};
+								let data_number = {{ data_number }};
+
+                                for(let i = 0; i < {{ number_of_new_item }}; i++)
+                                {
+                                        for(let j = 0; j < names.length; j++)
+                                        {
+                                                document.getElementById(names[j]+'('+i.toString() +')').setAttribute('value', insert_data[names[j]+'('+data_number[i].toString()+')']);
+                                        }
+                                }
+
+                                {% if update_mode %}
+                                        if(insert_data['upload_file(0)'] == "no")
+                                                document.getElementById('l(0)').value = insert_data['empty(0)'];
+                                {% endif %}
+                        })();
+        }
+</script>
+{% endblock form_script %}
+
+{% block form %}
+        <div id="gray">
+                <div id="append_form">
+                        <p align="center" valign="center"><b>
+                                {% if insert_mode %}
+                                        新增資料
+                                {% elif update_mode %}
+                                        編輯資料
+                                {% endif %}
+                        </p>
+                        <hr>
+                        {% block url %}
+                        <form method="POST" action="{{ url_for('get_version') }}" id="alist" name="alist">
+                        {% endblock url %}
+                                <table id="input_table">
+                                                <tr  class="blue">
+                                                        <th>Product</th>
+                                                        <th>Version</th>
+                                                        <th>System Type</th>
+                                                        <th>Type</th>
+                                                        <th>Name</th>
+                                                        <th>OS</th>
+                                                        {% if insert_mode %}
+                                                        <th style="width:100px;">File Classification</th>
+                                                        {% endif %}
+                                                        <th class="links">Link</th>
+                                                        <th class="state">State</th>
+                                                </tr>
+
+                                        {% for i in range(number_of_new_item) %}
+                                                <tr class="insert_sucess">
+                                                        <td>{{ product }}</td>
+                                                        <td><input type="text" placeholder="空白" name="v({{ i }})" id='v({{ i }})' readonly='readonly' style="width: 80%"></td>
+                                                        <td><input type="text" placeholder="空白" name="st({{ i }})" id='st({{ i }})' readonly='readonly' style="width: 80%"></td>
+                                                        <td><input type="text" placeholder="空白" name="t({{ i }})" id='t({{ i }})' readonly='readonly' style="width: 80%"></td>
+                                                        <td><input type="text" placeholder="空白" name="n({{ i }})" id='n({{ i }})' readonly='readonly' style="width: 80%"></td>
+                                                        <td><input type="text" placeholder="空白" name="o({{ i }})" id='o({{ i }})' readonly='readonly' style="width: 80%"></td>
+                                                        {% if insert_mode %}
+                                                        <td><input type="text" placeholder="空白" name="fc({{ i }})" id='fc({{ i }})' readonly='readonly' style="width: 80%"></td>
+                                                        {% endif %}
+                                                        <td class="links"><input type="text" placeholder="空白" name="l({{ i }})" value="" id='l({{ i }})' readonly='readonly' style='width:90%'></td>
+                                                        <td class="state"><input type="text" name="state({{ i }})"
+                                                                                {% if i in upload_fail_index %}
+                                                                               value="檔案上傳失敗"
+                                                                                {% else %}
+																				   {% if insert_mode %}
+																				   value="新增成功"
+																				   {% else %}
+																				   value="編輯成功"
+																				   {% endif %}
+                                                                                {% endif %}
+                                                                                id="state({{ i }})" readonly='readonly' style='width:50%'></td>
+                                                </tr>
+                                        {% endfor %}
+                                </table>
+
+                                <input type="text" name="product" value="{{ product }}" style="display:none;">
+                                <input type="text" name="version" value="{{ version }}" style="display:none;">
+                                <input type="text" name="check_update_file" style="display:none;">
+								
+								{% if uuid %}
+									<input type="text" name="uuid" value="{{ uuid }}" style="display:none;">
+								{% endif %}
+								
+                                <input type="submit" class="pointer" value="確定" id="make_sure">
+
+                        </form>
+                </div>
+        </div>
+{% endblock form %}

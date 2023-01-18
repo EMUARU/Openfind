@@ -1,0 +1,34 @@
+{% extends "form.html" %}
+
+{% block inputs%}
+    const names = ['v', 'st', 't', 'n', 'o', 'l', 'fi', 'upload_file', 'empty'];
+{% endblock inputs%}
+
+{% block add_file_classificationsID_to_link %}
+{% endblock add_file_classificationsID_to_link %}
+
+{% block url %}
+    <form method="POST" action="{{ url_for('update_item') }}" id="alist" name="alist" enctype="multipart/form-data">
+{% endblock url %}
+
+
+{% block first_data %}
+	<td><input class="v" type='text' placeholder="空白" value="{{ old_item['version'] }}" name="v" readonly='readonly' id='v' style="width: 80%;"></td>
+    <td><input list="system_types" placeholder="空白" value="{{ old_item['systemtype'] }}" name="st" id='st' style="width: 80%;"></td>
+    <td><input list="types" placeholder="空白" value="{{ old_item['servertype'] }}" name="t" id='t' style="width: 80%;"></td>
+    <td><input list="names" placeholder="空白" value="{{ old_item['name'] }}" name="n" id='n' style="width: 80%;"></td>
+    <td><input list="oss" placeholder="空白" value="{{ old_item['os'] }}" name="o" id='o' style="width: 80%;"></td>
+    <td class="links"><input type="text" placeholder="空白" value="" name="l" id='l' style="display:none; width: 90%;">
+        <input type="text" name="empty" placeholder="空白" value="{{ old_item['link'] }}" id='empty' readonly='readonly' style="display:block; width: 90%;"></td>
+{% endblock first_data %}
+
+
+{% block update_id %}
+    <input type="text" name="update_id" value='{{ old_item["id"] }}' id='update_id' style="display:none;">
+{% endblock update_id %}
+
+{% block file_classification%}
+{% endblock file_classification%}
+
+{% block append_data %}
+{% endblock append_data %}
