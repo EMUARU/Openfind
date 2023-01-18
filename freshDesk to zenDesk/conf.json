@@ -1,0 +1,14 @@
+{
+  "fd_domain": "openfind.freshdesk.com",
+  "fd_apikey": "wnAVnmzHt6rdzCMnlXyu",
+  "zd_domain": "openfind.zendesk.com",
+  "zd_email": "pm@openfind.com.tw",
+  "zd_password": "OFDeliver@SE#8!",
+  "locale": "zh-tw",
+  "user_segment_id": {
+    "everyone": "null",
+    "logged_in_user": "4505801650703",
+    "agents_administrators": "4505807980175"
+  },
+  "permission_group_id": "4505816232847"
+}
