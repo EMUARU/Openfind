@@ -1,2 +1,2 @@
 # Openfind
-product_module_management_system.py讀入文字檔後建立資料庫，在網頁伺服器可更新、上傳、更新產品各版本資料及檔案，再儲存回文字檔。
+product_module_management_system.py讀入文字檔後建立資料庫，在網頁伺服器可對產品各版本資料及檔案做CRUD操作，再儲存回文字檔。
